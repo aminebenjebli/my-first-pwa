@@ -1,43 +1,86 @@
-"use client";
 import ProductCard from "@/app/components/ProductCard";
-import { useRouter } from "next/navigation";
-const products = [
-  { id: 1, title: "Headphone", img: "/Assets/images/headphone.jpg" },
-  { id: 2, title: "Laptop", img: "/Assets/images/laptop.jpg" },
-  { id: 3, title: "Smartphone", img: "/Assets/images/smartphone.jpg" },
-  { id: 4, title: "Smartwatch", img: "/Assets/images/smartwatch.jpg" },
-  { id: 5, title: "Tablet", img: "/Assets/images/tablet.jpg" },
-];
-export default function ProductsPage() {
-  const router = useRouter();
+import Link from "next/link";
+import { fetchAllProducts } from "@/app/actions/productActions";
+
+export default async function ProductsPage() {
+  const products = await fetchAllProducts();
+
   return (
-    <div
-      className="min-h-screen w-full bg-gradient-to-br from-
-    blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-
-    slate-800 dark:to-slate-900 py-6 px-2 sm:px-6"
-    >
-      <div
-        className="max-w-6xl mx-auto grid grid-cols-1
-    sm:grid-cols-2 md:grid-cols-3 gap-8"
-      >
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="flex flex-col items-
-            center"
-          >
-            <ProductCard title={product.title} image={product.img} />
-            <button
-              className="mt-4 w-full sm:w-auto px-6 py-2
-            rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 text-
-            white font-semibold shadow hover:from-blue-700 hover:to-indigo-
-            600 transition-all text-base tracking-wide"
-              onClick={() => router.push(`/products/${product.id}`)}
-            >
-              View Details
-            </button>
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Our Products
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Browse our collection of amazing products
+            </p>
           </div>
-        ))}
+          <Link
+            href="/products/new"
+            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-md"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add Product
+          </Link>
+        </div>
+
+        {products.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">
+              No products found. Start by adding your first product!
+            </p>
+            <Link
+              href="/products/new"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors shadow-md"
+            >
+              Add Your First Product
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <Link
+                key={product._id}
+                href={`/products/${product._id}`}
+                className="group"
+              >
+                <div className="flex flex-col h-full bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <ProductCard title={product.title} image={product.img} />
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 flex-grow">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-green-600 dark:text-green-400">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      <span className="text-sm text-blue-600 dark:text-blue-400 group-hover:underline">
+                        View Details →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

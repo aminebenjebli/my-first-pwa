@@ -5,8 +5,9 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   return (
     <nav
-      className="bg-blue-700 text-white shadow-md sticky top-0 z-
-        50"
+      className="bg-gradient-to-br from-white via-blue-50
+    to-blue-100 dark:from-gray-900 dark:via-slate-800 dark:to-slate-
+    900 shadow-md border-b border-blue-100 dark:border-slate-700"
     >
       <div
         className="max-w-6xl mx-auto px-4 flex items-center

@@ -1,48 +1,16 @@
 import { notFound } from "next/navigation";
-const products = [
-  {
-    id: 1,
-    title: "Headphone",
-    img: "/Assets/images/headphone.jpg",
-    description:
-      "High-quality wireless headphones with noise cancellation and long battery life.",
-  },
-  {
-    id: 2,
-    title: "Laptop",
-    img: "/Assets/images/laptop.jpg",
-    description:
-      "Powerful laptop for work and play, featuring a sleek design and fast performance.",
-  },
-  {
-    id: 3,
-    title: "Smartphone",
-    img: "/Assets/images/smartphone.jpg",
-    description:
-      "Latest smartphone with stunning display, great camera, and all-day battery.",
-  },
-  {
-    id: 4,
-    title: "Smartwatch",
-    img: "/Assets/images/smartwatch.jpg",
-    description:
-      "Track your fitness and stay connected with this stylish smartwatch.",
-  },
-  {
-    id: 5,
-    title: "Tablet",
-    img: "/Assets/images/tablet.jpg",
-    description:
-      "Portable tablet perfect for reading, streaming, and productivity on the go.",
-  },
-];
+import Link from "next/link";
+import { fetchProduct } from "@/app/actions/productActions";
+import DeleteButton from "./DeleteButton";
+import ProductEditSection from "./ProductEditSection";
+
 export default async function ProductDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === Number(id));
+  const product = await fetchProduct(id);
   if (!product) return notFound();
   return (
     <main
@@ -54,25 +22,85 @@ export default async function ProductDetailPage({
         className="max-w-xl w-full mx-auto p-6 flex flex-col items-center bg-white/90 dark:bg-slate-900/90 rounded-2xl
         shadow-xl border border-blue-100 dark:border-slate-700"
       >
-        <img
-          src={product.img}
-          alt={product.title}
-          className="w-full h-56 object-cover rounded-xl mb-6
-        shadow border border-blue-200 dark:border-slate-700"
-        />
+        <div className="relative rounded-lg overflow-hidden shadow-md bg-white dark:bg-gray-800">
+          {/* Back button overlay on top-left of image */}
+          <div className="absolute top-3 left-3 z-20">
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center rounded-full w-10 h-10 bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-white shadow-sm hover:opacity-90"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </Link>
+          </div>
+
+          {/* action buttons moved under description (rendered below the description) */}
+
+          <div className="w-full h-96 md:h-[28rem]">
+            <img
+              src={product.img}
+              alt={product.title}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+
         <h1 className="text-3xl font-extrabold mb-2 text-blue-900 dark:text-blue-200 text-center tracking-tight drop-shadow-sm">
           {product.title}
         </h1>
+        <p className="text-lg font-semibold text-green-600 dark:text-green-400 mb-4">
+          ${product.price.toFixed(2)}
+        </p>
         <p className="text-gray-700 dark:text-gray-300 text-center mb-6 text-lg leading-relaxed">
           {product.description}
         </p>
-        <button
-          className="bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-8 py-3 rounded-xl font-semibold shadow
-            hover:from-blue-700 hover:to-indigo-600 transition-all text-lg
-            tracking-wide"
-        >
-          Buy Now
-        </button>
+
+        {/* Centered action row: Add, Edit, Delete */}
+        <div className="w-full mb-6 flex items-center justify-center gap-4">
+          <Link
+            href="/products/new"
+            className="inline-flex items-center justify-center rounded-full bg-blue-500 w-10 h-10 text-white hover:opacity-90 transition-shadow shadow-md"
+            aria-label="Add new product"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </Link>
+
+          {/* edit anchor removed - ProductEditSection provides the edit toggle */}
+
+          <DeleteButton productId={product._id} />
+        </div>
+
+        {/* Edit Form Section with Toggle */}
+        <ProductEditSection
+          productId={product._id}
+          title={product.title}
+          image={product.img}
+          price={product.price}
+          description={product.description}
+        />
       </section>
     </main>
   );
